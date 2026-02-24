@@ -36,11 +36,13 @@ export default function Home() {
     reset,
   } = useGemini();
 
-  const { wallet, isConnected } = usePinion();
+  const { wallet, isConnected, refreshBalance } = usePinion();
 
   const handleSubmit = async (question: string) => {
     reset();
     await requestInsight(question);
+    // Refresh wallet balance after payment
+    refreshBalance();
   };
 
   // Derive wallet stats from transaction history
@@ -52,10 +54,8 @@ export default function Home() {
     return { totalSpent, queryCount: history.length };
   }, [history]);
 
-  // Derive wallet address from payment result
-  const walletAddress = payment?.txHash
-    ? undefined // Real address would come from PinionOS SDK
-    : wallet?.address;
+  // Agent wallet address comes from the server-side PinionOS SDK
+  const walletAddress = wallet?.address;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -83,7 +83,7 @@ export default function Home() {
           <p className="text-muted text-sm max-w-2xl mx-auto">
             Ask complex market questions. The agent processes a{" "}
             <span className="text-accent font-mono">$0.01 USDC</span> x402
-            payment on Base L2 via PinionOS, then delivers premium AI insights
+            payment on Base Sepolia via PinionOS, then delivers premium AI insights
             from Gemini Flash.
           </p>
         </div>
@@ -139,7 +139,7 @@ export default function Home() {
               <div className="space-y-2">
                 {[
                   { label: "Payment Layer", value: "PinionOS x402" },
-                  { label: "Settlement", value: "USDC on Base L2" },
+                  { label: "Settlement", value: "USDC on Base Sepolia" },
                   { label: "AI Engine", value: "Gemini 3 Flash" },
                   { label: "Framework", value: "Next.js 15 + Tailwind" },
                   { label: "Cost per Query", value: "$0.01 USDC" },

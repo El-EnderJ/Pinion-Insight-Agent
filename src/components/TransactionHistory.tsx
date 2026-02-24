@@ -1,7 +1,8 @@
 /**
  * @component TransactionHistory
- * Sidebar panel showing all past payment transactions with
- * status indicators and cost tracking.
+ * Sidebar panel showing all past x402 payment transactions
+ * with real on-chain data: txHash (linked to BaseScan Sepolia),
+ * gas used, block number, and cost tracking.
  */
 
 "use client";
@@ -14,6 +15,9 @@ import {
   Coins,
   FileText,
   BarChart3,
+  ExternalLink,
+  Fuel,
+  Box,
 } from "lucide-react";
 import type { TransactionRecord } from "@/types";
 
@@ -29,7 +33,9 @@ export default function TransactionHistory({
     .reduce((sum, t) => sum + parseFloat(t.costUSDC), 0)
     .toFixed(2);
 
-  const successCount = transactions.filter((t) => t.status === "success").length;
+  const successCount = transactions.filter(
+    (t) => t.status === "success",
+  ).length;
 
   return (
     <div className="bg-card border border-card-border rounded-2xl overflow-hidden">
@@ -39,7 +45,7 @@ export default function TransactionHistory({
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-accent" />
             <h3 className="text-sm font-semibold text-foreground">
-              Transaction Log
+              On-chain Transaction Log
             </h3>
           </div>
           <span className="text-xs text-muted">
@@ -57,7 +63,7 @@ export default function TransactionHistory({
             </div>
             <div className="flex items-center gap-1.5 text-xs">
               <BarChart3 className="w-3 h-3 text-accent" />
-              <span className="text-muted">Success:</span>
+              <span className="text-muted">Confirmed:</span>
               <span className="font-mono text-foreground">
                 {successCount}/{transactions.length}
               </span>
@@ -67,14 +73,14 @@ export default function TransactionHistory({
       </div>
 
       {/* ── Transaction List ────────────────────────────────── */}
-      <div className="max-h-[400px] overflow-y-auto">
+      <div className="max-h-[500px] overflow-y-auto">
         {transactions.length === 0 ? (
           <div className="p-6 text-center">
             <Clock className="w-8 h-8 text-muted/30 mx-auto mb-2" />
             <p className="text-xs text-muted">
               No transactions yet.
               <br />
-              Ask a question to get started.
+              Ask a question to trigger a real x402 payment.
             </p>
           </div>
         ) : (
@@ -101,9 +107,12 @@ export default function TransactionHistory({
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
+                    {/* Query text */}
                     <p className="text-xs text-foreground line-clamp-1 font-medium">
                       {tx.query}
                     </p>
+
+                    {/* Cost + Timestamp */}
                     <div className="flex items-center gap-2 mt-1">
                       <span
                         className={`text-xs font-mono ${
@@ -114,12 +123,44 @@ export default function TransactionHistory({
                               : "text-warning"
                         }`}
                       >
-                        ${tx.costUSDC}
+                        ${tx.costUSDC} USDC
                       </span>
                       <span className="text-xs text-muted">
                         {formatTimestamp(tx.timestamp)}
                       </span>
                     </div>
+
+                    {/* On-chain details */}
+                    {tx.txHash && tx.txHash !== "0x" && (
+                      <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+                        {/* TxHash link */}
+                        <a
+                          href={tx.explorerUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-[10px] font-mono text-accent hover:text-accent/80 transition-colors"
+                        >
+                          {truncateHash(tx.txHash)}
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+
+                        {/* Gas Used */}
+                        {tx.gasUsed && (
+                          <span className="flex items-center gap-1 text-[10px] text-muted">
+                            <Fuel className="w-2.5 h-2.5" />
+                            {Number(tx.gasUsed).toLocaleString()} gas
+                          </span>
+                        )}
+
+                        {/* Block Number */}
+                        {tx.blockNumber && (
+                          <span className="flex items-center gap-1 text-[10px] text-muted">
+                            <Box className="w-2.5 h-2.5" />
+                            #{tx.blockNumber.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -129,6 +170,12 @@ export default function TransactionHistory({
       </div>
     </div>
   );
+}
+
+/* ─── Helpers ─────────────────────────────────────────────────────── */
+
+function truncateHash(hash: string): string {
+  return `${hash.slice(0, 8)}…${hash.slice(-6)}`;
 }
 
 function formatTimestamp(ts: number): string {

@@ -1,9 +1,8 @@
 /**
  * @module types
- * Core TypeScript interfaces for the Pinion Insight Agent
+ * Core TypeScript interfaces for the Pinion Insight Agent.
  *
- * Defines all shared types used across the application including
- * payment sessions, agent states, transaction records, and API responses.
+ * All payment types reflect real on-chain data from Base Sepolia.
  */
 
 /* ─── Agent Query ─────────────────────────────────────────────────── */
@@ -58,12 +57,19 @@ export interface PaymentSession {
   timestamp: number;
 }
 
+/**
+ * On-chain payment receipt from a real Base Sepolia USDC transfer.
+ */
 export interface PaymentResult {
   success: boolean;
-  txHash?: string;
-  skill: string;
-  cost: string;
-  data?: unknown;
+  txHash: string;
+  from: string;
+  to: string;
+  amount: string;
+  gasUsed: string;
+  blockNumber: number;
+  confirmations: number;
+  explorerUrl: string;
   error?: string;
 }
 
@@ -87,6 +93,9 @@ export interface TransactionRecord {
   query: string;
   costUSDC: string;
   txHash?: string;
+  gasUsed?: string;
+  blockNumber?: number;
+  explorerUrl?: string;
   status: "success" | "failed" | "pending";
   timestamp: number;
   insight?: string;
@@ -99,6 +108,7 @@ export interface WalletInfo {
   ethBalance: string;
   usdcBalance: string;
   network: string;
+  chainId?: number;
 }
 
 /* ─── API Route Payloads ──────────────────────────────────────────── */
@@ -112,13 +122,19 @@ export interface InsightResponseBody {
   success: boolean;
   insight?: AgentInsight;
   payment?: PaymentResult;
-  /** True when PinionOS payment succeeded but AI generation failed */
+  /** True when the x402 payment succeeded but AI generation failed */
   paymentSucceeded?: boolean;
   error?: string;
   errorType?: "payment" | "ai" | "validation" | "unknown";
 }
 
 export interface BalanceResponseBody {
+  success: boolean;
+  wallet?: WalletInfo;
+  error?: string;
+}
+
+export interface AgentResponseBody {
   success: boolean;
   wallet?: WalletInfo;
   error?: string;

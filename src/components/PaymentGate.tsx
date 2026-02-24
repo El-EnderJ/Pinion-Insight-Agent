@@ -41,22 +41,22 @@ interface PaymentGateProps {
 const STEPS = [
   {
     label: "Estimating Compute Cost",
-    description: "Calculating required skill calls...",
+    description: "Calculating required USDC on Base Sepolia...",
     icon: Cpu,
   },
   {
-    label: "Signing x402 Payment",
-    description: "EIP-3009 authorization on Base L2...",
+    label: "Signing USDC Transfer",
+    description: "Broadcasting tx to Base Sepolia...",
     icon: DollarSign,
   },
   {
-    label: "Verifying Transaction",
-    description: "Facilitator confirming USDC settlement...",
+    label: "On-chain Confirmation",
+    description: "Waiting for block confirmation (1 block)...",
     icon: Shield,
   },
   {
     label: "Unlocking AI Agent",
-    description: "PINION-ALPHA generating insight...",
+    description: "Payment verified — PINION-ALPHA generating insight...",
     icon: Zap,
   },
 ];
@@ -239,7 +239,7 @@ export default function PaymentGate({
                   x402 Payment Verified
                 </p>
                 <p className="text-xs text-muted mt-1">
-                  $0.01 USDC settled on Base L2 via PinionOS
+                  $0.01 USDC settled on Base Sepolia via PinionOS
                 </p>
               </div>
             </div>

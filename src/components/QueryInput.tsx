@@ -36,7 +36,7 @@ const EXAMPLE_PROMPTS = [
   {
     icon: Shield,
     label: "DeFi Strategy",
-    prompt: "What are the top 3 yield farming strategies on Base L2 right now with the best risk-adjusted returns?",
+    prompt: "What are the top 3 yield farming strategies on Base Sepolia right now with the best risk-adjusted returns?",
   },
   {
     icon: Search,

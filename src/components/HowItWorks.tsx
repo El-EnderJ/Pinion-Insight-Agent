@@ -20,7 +20,7 @@ const STEPS = [
     icon: CreditCard,
     title: "Micropayment via x402",
     description:
-      "PinionOS processes an autonomous $0.01 USDC payment on Base L2. No wallet connection needed — the agent controls its own wallet.",
+      "PinionOS processes an autonomous $0.01 USDC payment on Base Sepolia. No wallet connection needed — the agent controls its own wallet.",
     color: "from-violet-500 to-violet-600",
   },
   {

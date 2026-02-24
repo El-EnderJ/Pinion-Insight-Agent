@@ -94,8 +94,23 @@ export default function InsightDisplay({
         {payment && (
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card border border-card-border text-xs text-muted">
             <Coins className="w-3 h-3 text-accent" />
-            <span className="font-mono">${payment.cost} USDC</span>
+            <span className="font-mono">${payment.amount} USDC</span>
           </div>
+        )}
+
+        {/* TxHash */}
+        {payment?.txHash && payment.txHash !== "0x" && (
+          <a
+            href={payment.explorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-card border border-card-border text-xs text-accent hover:text-accent/80 transition-colors"
+          >
+            <Hash className="w-3 h-3" />
+            <span className="font-mono">
+              {payment.txHash.slice(0, 8)}…{payment.txHash.slice(-6)}
+            </span>
+          </a>
         )}
 
         {/* Latency */}

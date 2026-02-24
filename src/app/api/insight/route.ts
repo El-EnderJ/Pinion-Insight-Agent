@@ -1,18 +1,17 @@
 /**
  * POST /api/insight
  *
- * Core endpoint: processes a PinionOS micropayment, then calls
- * Gemini Flash to generate the AI insight.
+ * Core endpoint for the Pay-per-AI-Agent flow on Base Sepolia:
  *
- * Flow:
- * 1. Validate the incoming question
- * 2. Execute a PinionOS skill call (x402 payment on Base)
- * 3. On payment success, call Gemini Flash for the insight
- * 4. Return the combined result — or partial success if AI fails
+ * 1. Validate the incoming question.
+ * 2. Execute a real USDC micropayment ($0.01) via processPayment().
+ * 3. Verify the on-chain receipt (txHash confirmed, status === 1).
+ * 4. Only if the payment is confirmed, call Gemini Flash for the insight.
+ * 5. Return the combined result — or partial success if AI fails.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { executePayment } from "@/lib/pinion";
+import { processPayment, verifyTransaction } from "@/lib/pinion";
 import { generateInsight } from "@/lib/gemini";
 import type { InsightRequestBody, InsightResponseBody } from "@/types";
 
@@ -22,28 +21,48 @@ export async function POST(request: NextRequest) {
 
     if (!body.question || body.question.trim().length < 3) {
       return NextResponse.json<InsightResponseBody>(
-        { success: false, error: "Question must be at least 3 characters.", errorType: "validation" },
-        { status: 400 }
+        {
+          success: false,
+          error: "Question must be at least 3 characters.",
+          errorType: "validation",
+        },
+        { status: 400 },
       );
     }
 
-    /* ── Step 1: Process micropayment via PinionOS ────────────── */
-    const payment = await executePayment("price", "ETH");
+    /* ── Step 1: Process real x402 micropayment on Base Sepolia ── */
+    const payment = await processPayment();
 
     if (!payment.success) {
       return NextResponse.json<InsightResponseBody>(
         {
           success: false,
-          error: `PinionOS payment failed: ${payment.error}`,
+          error: `x402 payment failed: ${payment.error}`,
           errorType: "payment",
           payment,
           paymentSucceeded: false,
         },
-        { status: 402 }
+        { status: 402 },
       );
     }
 
-    /* ── Step 2: Generate AI insight via Gemini Flash ─────────── */
+    /* ── Step 2: Verify the on-chain transaction ──────────────── */
+    const verification = await verifyTransaction(payment.txHash);
+
+    if (!verification.verified) {
+      return NextResponse.json<InsightResponseBody>(
+        {
+          success: false,
+          error: `On-chain verification failed: ${verification.status}`,
+          errorType: "payment",
+          payment,
+          paymentSucceeded: false,
+        },
+        { status: 402 },
+      );
+    }
+
+    /* ── Step 3: Generate AI insight via Gemini Flash ─────────── */
     try {
       const insight = await generateInsight(body.question);
 
@@ -59,9 +78,13 @@ export async function POST(request: NextRequest) {
         paymentSucceeded: true,
       });
     } catch (aiErr) {
-      // Payment succeeded but Gemini failed — return partial success
-      const aiMessage = aiErr instanceof Error ? aiErr.message : "AI generation failed";
-      console.error("[API /insight] Gemini failed after successful payment:", aiMessage);
+      // Payment succeeded & verified but Gemini failed
+      const aiMessage =
+        aiErr instanceof Error ? aiErr.message : "AI generation failed";
+      console.error(
+        "[API /insight] Gemini failed after verified payment:",
+        aiMessage,
+      );
 
       return NextResponse.json<InsightResponseBody>(
         {
@@ -71,16 +94,17 @@ export async function POST(request: NextRequest) {
           payment,
           paymentSucceeded: true,
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Internal server error";
+    const message =
+      err instanceof Error ? err.message : "Internal server error";
     console.error("[API /insight]", message);
 
     return NextResponse.json<InsightResponseBody>(
       { success: false, error: message, errorType: "unknown" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

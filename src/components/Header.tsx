@@ -85,8 +85,8 @@ export default function Header({
           <div className="flex items-center gap-4">
             {/* Network Badge */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-card-border text-xs">
-              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-              <span className="text-muted">Base L2</span>
+              <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+              <span className="text-muted">Base Sepolia</span>
               <span className="text-foreground font-mono">USDC</span>
             </div>
 
@@ -154,7 +154,7 @@ export default function Header({
                               {walletAddress}
                             </span>
                             <a
-                              href={`https://basescan.org/address/${walletAddress}`}
+                              href={`https://sepolia.basescan.org/address/${walletAddress}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-accent hover:text-accent/80 shrink-0"
@@ -208,8 +208,8 @@ export default function Header({
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted">Network</span>
                           <span className="font-mono text-foreground flex items-center gap-1">
-                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            Base L2
+                            <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                            Base Sepolia
                           </span>
                         </div>
                         <div className="flex items-center justify-between text-xs">

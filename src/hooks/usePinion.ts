@@ -1,11 +1,11 @@
 /**
  * @module usePinion
- * React hook for interacting with PinionOS wallet features.
+ * React hook for the agent's on-chain wallet state on Base Sepolia.
  *
  * Provides client-side state management for:
- * - Wallet balance polling
+ * - Auto-fetching agent wallet address + real on-chain balances
+ * - Balance refresh after each transaction
  * - Payment session tracking
- * - Connection status
  */
 
 "use client";
@@ -14,9 +14,9 @@ import { useState, useCallback, useEffect } from "react";
 import type { WalletInfo, PaymentStatus } from "@/types";
 
 interface UsePinionState {
-  /** Whether the wallet is connected (has a valid address) */
+  /** Whether the wallet data is loaded */
   isConnected: boolean;
-  /** Current wallet information */
+  /** Current wallet information (real on-chain data) */
   wallet: WalletInfo | null;
   /** Current payment processing status */
   paymentStatus: PaymentStatus;
@@ -27,18 +27,17 @@ interface UsePinionState {
 }
 
 interface UsePinionReturn extends UsePinionState {
-  /** Fetch wallet balance for a given address */
-  fetchBalance: (address: string) => Promise<void>;
+  /** Refresh the agent wallet balance */
+  refreshBalance: () => Promise<void>;
   /** Set the payment status */
   setPaymentStatus: (status: PaymentStatus) => void;
 }
 
 /**
- * Hook for managing PinionOS wallet state.
- *
- * @param walletAddress - Optional initial wallet address to auto-fetch
+ * Hook for managing the agent's on-chain wallet state.
+ * Automatically fetches wallet info from /api/agent on mount.
  */
-export function usePinion(walletAddress?: string): UsePinionReturn {
+export function usePinion(): UsePinionReturn {
   const [state, setState] = useState<UsePinionState>({
     isConnected: false,
     wallet: null,
@@ -47,15 +46,15 @@ export function usePinion(walletAddress?: string): UsePinionReturn {
     error: null,
   });
 
-  const fetchBalance = useCallback(async (address: string) => {
+  const refreshBalance = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoadingWallet: true, error: null }));
 
     try {
-      const res = await fetch(`/api/balance?address=${address}`);
+      const res = await fetch("/api/agent");
       const data = await res.json();
 
       if (!data.success) {
-        throw new Error(data.error ?? "Failed to fetch balance");
+        throw new Error(data.error ?? "Failed to fetch agent wallet");
       }
 
       setState((prev) => ({
@@ -78,12 +77,10 @@ export function usePinion(walletAddress?: string): UsePinionReturn {
     setState((prev) => ({ ...prev, paymentStatus: status }));
   }, []);
 
-  // Auto-fetch balance if address provided
+  // Auto-fetch agent wallet on mount
   useEffect(() => {
-    if (walletAddress) {
-      fetchBalance(walletAddress);
-    }
-  }, [walletAddress, fetchBalance]);
+    refreshBalance();
+  }, [refreshBalance]);
 
-  return { ...state, fetchBalance, setPaymentStatus };
+  return { ...state, refreshBalance, setPaymentStatus };
 }

@@ -6,9 +6,9 @@
  * 1. Sends the query to /api/insight (server processes payment + AI)
  * 2. Tracks loading, error, and result states
  * 3. Distinguishes between payment failures and AI failures
- * 4. Maintains a history of past queries
+ * 4. Maintains a history of past queries with on-chain tx data
  *
- * All PinionOS payment logic and Gemini calls happen server-side.
+ * All x402 payment logic and Gemini calls happen server-side.
  * This hook only communicates with our Next.js API route.
  */
 
@@ -27,7 +27,7 @@ interface UseGeminiState {
   isLoading: boolean;
   /** The latest AI insight response */
   insight: AgentInsight | null;
-  /** The latest payment result from PinionOS */
+  /** The latest on-chain payment receipt */
   payment: PaymentResult | null;
   /** Error message if the request failed */
   error: string | null;
@@ -35,7 +35,7 @@ interface UseGeminiState {
   errorType: string | null;
   /** Whether the x402 payment succeeded (even if AI failed) */
   paymentSucceeded: boolean;
-  /** List of all past transactions */
+  /** List of all past transactions with real on-chain data */
   history: TransactionRecord[];
 }
 
@@ -72,7 +72,7 @@ export function useGemini(): UseGeminiReturn {
 
     try {
       const controller = new AbortController();
-      const fetchTimeout = setTimeout(() => controller.abort(), 60_000); // 60s client-side safety net
+      const fetchTimeout = setTimeout(() => controller.abort(), 120_000);
 
       const res = await fetch("/api/insight", {
         method: "POST",
@@ -84,14 +84,16 @@ export function useGemini(): UseGeminiReturn {
       const data: InsightResponseBody = await res.json();
 
       if (!data.success) {
-        // Determine if payment succeeded even though overall failed
         const paidOk = data.paymentSucceeded === true;
 
         const record: TransactionRecord = {
           id: txId,
           query: question,
-          costUSDC: paidOk ? (data.payment?.cost ?? "0.01") : "0.00",
+          costUSDC: paidOk ? (data.payment?.amount ?? "0.01") : "0.00",
           txHash: data.payment?.txHash,
+          gasUsed: data.payment?.gasUsed,
+          blockNumber: data.payment?.blockNumber,
+          explorerUrl: data.payment?.explorerUrl,
           status: paidOk ? "success" : "failed",
           timestamp: Date.now(),
         };
@@ -111,8 +113,11 @@ export function useGemini(): UseGeminiReturn {
       const record: TransactionRecord = {
         id: txId,
         query: question,
-        costUSDC: data.payment?.cost ?? "0.01",
+        costUSDC: data.payment?.amount ?? "0.01",
         txHash: data.payment?.txHash,
+        gasUsed: data.payment?.gasUsed,
+        blockNumber: data.payment?.blockNumber,
+        explorerUrl: data.payment?.explorerUrl,
         status: "success",
         timestamp: Date.now(),
         insight: data.insight?.content?.slice(0, 100) + "...",
@@ -127,9 +132,10 @@ export function useGemini(): UseGeminiReturn {
         history: [record, ...prev.history],
       }));
     } catch (err) {
-      const isAbort = err instanceof DOMException && err.name === "AbortError";
+      const isAbort =
+        err instanceof DOMException && err.name === "AbortError";
       const message = isAbort
-        ? "Request timed out — the AI service took too long to respond. Please try again."
+        ? "Request timed out — the payment or AI service took too long. Please try again."
         : err instanceof Error
           ? err.message
           : "Network request failed";

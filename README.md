@@ -250,7 +250,7 @@ Every `$0.01 USDC` micropayment is routed to the Pinion Insight Agent **Treasury
 
 **Live on-chain proof (BaseScan):**
 
-> 🔗 _[Link to BaseScan — USDC incoming transfers to the Treasury Wallet]_ ← **INSERT LINK HERE AFTER DEMO**
+> 🔗 [_[Link to BaseScan — USDC incoming transfers to the Treasury Wallet]_](https://sepolia.basescan.org/tx/0x95439f8ea24fb347a118b5e9d93dbadf3ee6b0e72b786b8a9ef8b924f4e142cf)
 
 ---
 

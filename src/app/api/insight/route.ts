@@ -64,7 +64,9 @@ export async function POST(request: NextRequest) {
 
     /* ── Step 3: Generate AI insight via Gemini Flash ─────────── */
     try {
-      const insight = await generateInsight(body.question);
+      // Pass conversation history for multi-turn context (last 4-6 messages)
+      const history = Array.isArray(body.history) ? body.history.slice(-6) : undefined;
+      const insight = await generateInsight(body.question, history);
 
       return NextResponse.json<InsightResponseBody>({
         success: true,

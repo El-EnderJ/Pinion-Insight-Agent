@@ -71,13 +71,21 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return Promise.race([promise, timer]);
 }
 
+/** Chat history entry for multi-turn context */
+export interface ChatHistoryEntry {
+  role: "user" | "assistant";
+  content: string;
+}
+
 /**
  * Try generating content with a single model.
+ * Supports optional multi-turn conversation history.
  * Throws on failure so the caller can retry / fallback.
  */
 async function tryGenerate(
   modelName: string,
   question: string,
+  history?: ChatHistoryEntry[],
 ): Promise<GeminiInsight> {
   const start = performance.now();
   const genAI = getGenAI();
@@ -91,10 +99,28 @@ async function tryGenerate(
     systemInstruction: SYSTEM_PROMPT,
   });
 
-  const result = await withTimeout(
-    model.generateContent(question),
-    GEMINI_CONFIG.timeoutMs,
-  );
+  let result;
+
+  if (history && history.length > 0) {
+    // Multi-turn: use startChat with previous messages as context
+    const chatHistory = history.map((msg) => ({
+      role: msg.role === "assistant" ? "model" : "user",
+      parts: [{ text: msg.content }],
+    }));
+
+    const chat = model.startChat({ history: chatHistory });
+    result = await withTimeout(
+      chat.sendMessage(question),
+      GEMINI_CONFIG.timeoutMs,
+    );
+  } else {
+    // Single-turn: just generate content directly
+    result = await withTimeout(
+      model.generateContent(question),
+      GEMINI_CONFIG.timeoutMs,
+    );
+  }
+
   const response = result.response;
   const text = response.text();
   const latency = Math.round(performance.now() - start);
@@ -107,15 +133,21 @@ async function tryGenerate(
  * Generates a market intelligence insight using Gemini Flash.
  * Automatically retries on 429 / 503 errors and falls back
  * to alternative models if the primary is rate-limited.
+ *
+ * @param question - The user's latest question
+ * @param history  - Optional previous messages for multi-turn context (last 4-6)
  */
-export async function generateInsight(question: string): Promise<GeminiInsight> {
+export async function generateInsight(
+  question: string,
+  history?: ChatHistoryEntry[],
+): Promise<GeminiInsight> {
   const allModels: string[] = [...GEMINI_MODELS];
   let lastError: Error | null = null;
 
   for (const modelName of allModels) {
     for (let attempt = 0; attempt <= GEMINI_CONFIG.maxRetries; attempt++) {
       try {
-        return await tryGenerate(modelName, question);
+        return await tryGenerate(modelName, question, history);
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
         const msg = lastError.message;

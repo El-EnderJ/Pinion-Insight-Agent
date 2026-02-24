@@ -111,11 +111,38 @@ export interface WalletInfo {
   chainId?: number;
 }
 
+/* ─── Multi-turn Chat ─────────────────────────────────────────────── */
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
+  /** On-chain tx hash tied to this message (user messages only) */
+  txHash?: string;
+  /** Payment metadata for this exchange */
+  payment?: PaymentResult;
+  /** AI model that generated the response (assistant messages only) */
+  model?: string;
+  /** Generation latency in ms (assistant messages only) */
+  latency?: number;
+}
+
+export interface Conversation {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  createdAt: number;
+  updatedAt: number;
+}
+
 /* ─── API Route Payloads ──────────────────────────────────────────── */
 
 export interface InsightRequestBody {
   question: string;
   category?: QueryCategory;
+  /** Previous messages for multi-turn context (last 4-6) */
+  history?: { role: "user" | "assistant"; content: string }[];
 }
 
 export interface InsightResponseBody {

@@ -2,136 +2,158 @@
  * @page Home
  * Main dashboard page for the Pinion Insight Agent.
  *
- * Orchestrates the full "Pay-per-AI-Agent" flow:
- * 1. User types a question → QueryInput
- * 2. Payment gate activates → PaymentGate
- * 3. AI insight renders → InsightDisplay
- * 4. Transaction logged → TransactionHistory
+ * Multi-turn chat architecture:
+ * - Left: Collapsible ChatSidebar (conversation list)
+ * - Center: ChatView (message bubbles) + ChatInput + PaymentGate
+ * - Right: TransactionHistory (filtered to active conversation)
+ *
+ * Each message triggers a real $0.01 USDC x402 payment on Base Sepolia.
+ * Conversations persist in localStorage.
  */
 
 "use client";
 
-import { useMemo } from "react";
-import { useGemini } from "@/hooks/useGemini";
+import { useState, useMemo } from "react";
+import { useConversations } from "@/hooks/useConversations";
 import { usePinion } from "@/hooks/usePinion";
 import Header from "@/components/Header";
-import QueryInput from "@/components/QueryInput";
+import ChatSidebar from "@/components/ChatSidebar";
+import ChatView from "@/components/ChatView";
+import ChatInput from "@/components/ChatInput";
 import PaymentGate from "@/components/PaymentGate";
-import InsightDisplay from "@/components/InsightDisplay";
 import TransactionHistory from "@/components/TransactionHistory";
-import StatsBar from "@/components/StatsBar";
-import HowItWorks from "@/components/HowItWorks";
 import Footer from "@/components/Footer";
+import type { TransactionRecord } from "@/types";
 
 export default function Home() {
   const {
+    conversations,
+    activeConversation,
+    activeId,
     isLoading,
-    insight,
-    payment,
     error,
     errorType,
     paymentSucceeded,
-    history,
-    requestInsight,
-    reset,
-  } = useGemini();
+    createConversation,
+    setActiveConversation,
+    deleteConversation,
+    sendMessage,
+  } = useConversations();
 
   const { wallet, isConnected, refreshBalance } = usePinion();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const handleSubmit = async (question: string) => {
-    reset();
-    await requestInsight(question);
-    // Refresh wallet balance after payment
+  const handleSendMessage = async (content: string) => {
+    await sendMessage(content);
     refreshBalance();
   };
 
-  // Derive wallet stats from transaction history
-  const sessionStats = useMemo(() => {
-    const successful = history.filter((t) => t.status === "success");
-    const totalSpent = successful
-      .reduce((sum, t) => sum + parseFloat(t.costUSDC || "0"), 0)
-      .toFixed(2);
-    return { totalSpent, queryCount: history.length };
-  }, [history]);
+  // Build transaction records from active conversation messages
+  const activeTransactions: TransactionRecord[] = useMemo(() => {
+    if (!activeConversation) return [];
+    return activeConversation.messages
+      .filter((m) => m.role === "user")
+      .map((m) => ({
+        id: m.id,
+        query: m.content,
+        costUSDC: m.payment?.amount ?? (m.txHash ? "0.01" : "0.00"),
+        txHash: m.txHash,
+        gasUsed: m.payment?.gasUsed,
+        blockNumber: m.payment?.blockNumber,
+        explorerUrl: m.payment?.explorerUrl,
+        status: m.txHash ? ("success" as const) : ("failed" as const),
+        timestamp: m.timestamp,
+      }));
+  }, [activeConversation]);
 
-  // Agent wallet address comes from the server-side PinionOS SDK
+  // Global stats across all conversations
+  const globalStats = useMemo(() => {
+    let totalSpent = 0;
+    let queryCount = 0;
+    for (const conv of conversations) {
+      for (const m of conv.messages) {
+        if (m.role === "user") {
+          queryCount++;
+          if (m.txHash) {
+            totalSpent += parseFloat(m.payment?.amount ?? "0.01");
+          }
+        }
+      }
+    }
+    return { totalSpent: totalSpent.toFixed(2), queryCount };
+  }, [conversations]);
+
   const walletAddress = wallet?.address;
+  const hasAnySuccess = conversations.some((c) =>
+    c.messages.some((m) => m.role === "user" && m.txHash),
+  );
+
+  // Determine if insight is confirmed (last assistant message exists)
+  const lastAssistantMsg = activeConversation?.messages
+    .filter((m) => m.role === "assistant")
+    .at(-1);
+  const isConfirmed = !!lastAssistantMsg && !isLoading;
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* ── Header ──────────────────────────────────────────── */}
       <Header
-        isConnected={isConnected || history.some((t) => t.status === "success")}
+        isConnected={isConnected || hasAnySuccess}
         walletAddress={walletAddress}
         usdcBalance={wallet?.usdcBalance}
         ethBalance={wallet?.ethBalance}
-        totalSpent={sessionStats.totalSpent}
-        queryCount={sessionStats.queryCount}
+        totalSpent={globalStats.totalSpent}
+        queryCount={globalStats.queryCount}
       />
 
-      {/* ── Main Content ────────────────────────────────────── */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3">
-            <span className="text-gradient">AI Market Intelligence</span>
-            <br />
-            <span className="text-foreground/80 text-xl sm:text-2xl">
-              Powered by Autonomous Micropayments
-            </span>
-          </h2>
-          <p className="text-muted text-sm max-w-2xl mx-auto">
-            Ask complex market questions. The agent processes a{" "}
-            <span className="text-accent font-mono">$0.01 USDC</span> x402
-            payment on Base Sepolia via PinionOS, then delivers premium AI insights
-            from Gemini Flash.
-          </p>
+      {/* ── Main Layout ─────────────────────────────────────── */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left: Chat Sidebar */}
+        <ChatSidebar
+          conversations={conversations}
+          activeId={activeId}
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen((p) => !p)}
+          onNewChat={createConversation}
+          onSelect={setActiveConversation}
+          onDelete={deleteConversation}
+        />
+
+        {/* Center: Chat Area */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Messages */}
+          <ChatView
+            messages={activeConversation?.messages ?? []}
+            isLoading={isLoading}
+          />
+
+          {/* Payment Gate (overlay during processing) */}
+          {(isLoading || error) && (
+            <div className="px-4 pb-2">
+              <PaymentGate
+                isProcessing={isLoading}
+                isConfirmed={isConfirmed}
+                error={error}
+                errorType={errorType as "payment" | "ai" | "validation" | "unknown" | null}
+                paymentSucceeded={paymentSucceeded}
+              />
+            </div>
+          )}
+
+          {/* Chat Input */}
+          <ChatInput
+            onSubmit={handleSendMessage}
+            isLoading={isLoading}
+          />
         </div>
 
-        {/* Stats */}
-        {history.length > 0 && (
-          <div className="mb-6">
-            <StatsBar transactions={history} latestInsight={insight} />
-          </div>
-        )}
-
-        {/* Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* ── Left: Main Flow (2/3) ─────────────────────── */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Query Input */}
-            <QueryInput
-              onSubmit={handleSubmit}
-              isLoading={isLoading}
-            />
-
-            {/* Payment Gate (shows during processing) */}
-            <PaymentGate
-              isProcessing={isLoading}
-              isConfirmed={!!insight}
-              error={error}
-              errorType={errorType as "payment" | "ai" | "validation" | "unknown" | null}
-              paymentSucceeded={paymentSucceeded}
-            />
-
-            {/* AI Insight (shows after success) */}
-            {insight && (
-              <InsightDisplay insight={insight} payment={payment} />
-            )}
-
-            {/* How It Works (shows when idle and no results) */}
-            {!insight && !isLoading && !error && (
-              <HowItWorks />
-            )}
-          </div>
-
-          {/* ── Right: Sidebar (1/3) ──────────────────────── */}
-          <div className="space-y-6">
-            {/* Transaction History */}
-            <TransactionHistory transactions={history} />
+        {/* Right: Transaction Log (hidden on mobile) */}
+        <div className="hidden xl:block w-80 shrink-0 border-l border-card-border overflow-y-auto">
+          <div className="p-3">
+            <TransactionHistory transactions={activeTransactions} />
 
             {/* Tech Stack Info */}
-            <div className="bg-card border border-card-border rounded-2xl p-4">
+            <div className="bg-card border border-card-border rounded-2xl p-4 mt-3">
               <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
                 Tech Stack
@@ -142,7 +164,7 @@ export default function Home() {
                   { label: "Settlement", value: "USDC on Base Sepolia" },
                   { label: "AI Engine", value: "Gemini 3 Flash" },
                   { label: "Framework", value: "Next.js 15 + Tailwind" },
-                  { label: "Cost per Query", value: "$0.01 USDC" },
+                  { label: "Cost per Message", value: "$0.01 USDC" },
                 ].map(({ label, value }) => (
                   <div
                     key={label}
@@ -156,7 +178,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* ── Footer ──────────────────────────────────────────── */}
       <Footer />

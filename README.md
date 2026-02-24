@@ -1,8 +1,8 @@
 # 🤖 Pinion Insight Agent
 
-> **AI-Powered Market Intelligence with Autonomous Micropayments**
+> **The First Autonomous AI Intelligence Platform powered by x402 Micropayments**
 >
-> A production-ready dashboard demonstrating the future of monetized AI agents. Every insight is paid for on-chain — in real time — via PinionOS x402 on Base Sepolia Testnet.
+> An MVP product that redefines how AI services are monetized. Hold multi-turn conversations with an intelligence agent that charges $0.01 USDC per message — on-chain, in real time, on Base Sepolia — with no subscriptions, no accounts, and no intermediaries.
 
 <p align="center">
   <img src="https://img.shields.io/badge/PinionOS-Hackathon%202026-blueviolet?style=for-the-badge&logo=ethereum&logoColor=white" alt="Hackathon" />
@@ -11,43 +11,72 @@
   <img src="https://img.shields.io/badge/PinionOS-x402%20Protocol-06b6d4?style=for-the-badge&logo=ethereum&logoColor=white" alt="PinionOS" />
   <img src="https://img.shields.io/badge/Network-Base%20Sepolia-1652F0?style=for-the-badge&logo=ethereum&logoColor=white" alt="Base Sepolia" />
   <img src="https://img.shields.io/badge/Settlement-USDC%20%240.01-10b981?style=for-the-badge" alt="USDC" />
+  <img src="https://img.shields.io/badge/Chat-Multi--Turn%20Agentic-FF6B6B?style=for-the-badge&logo=openai&logoColor=white" alt="Multi-Turn Chat" />
 </p>
 
 ---
 
 ## 📋 Overview
 
-**Pinion Insight Agent** is a full-stack demonstration of autonomous AI agents operating as businesses on-chain. Users ask market intelligence questions and the agent:
+**Pinion Insight Agent** is a full-stack MVP product that proves autonomous AI agents can operate as self-sustaining businesses on-chain. Unlike a simple single-query tool, this is a **persistent multi-turn chat platform** — users start deep research sessions with an intelligence agent and pay only for each message they send, with every payment confirmed on Base Sepolia before a single token is generated.
+
+Each chat message follows this lifecycle:
 
 1. 💰 **Collects payment** — $0.01 USDC x402 micropayment on Base Sepolia
-2. 🔒 **Validates on-chain** — insight is **locked** until the payment is confirmed by PinionOS
-3. 🤖 **Calls Gemini 3 Flash** — premium analysis only after cryptographic payment proof
-4. ✍️ **Streams the response** — word-by-word typing animation
-5. 📜 **Logs the transaction** — immutable record with tx hash & cost
+2. 🔒 **Validates on-chain** — the reply is **locked** until PinionOS confirms the USDC transfer
+3. 🧠 **Sends full context** — the agent receives the last 6 messages for genuine conversational awareness
+4. 🤖 **Calls Gemini 3 Flash** — premium analysis only after cryptographic payment proof
+5. ✍️ **Streams the response** — word-by-word typing animation in the chat bubble
+6. 📜 **Logs the transaction** — per-message tx hash, gas used, and block number in the On-chain Transaction Log
 
-This proves that **AI services can be monetized at the API level** itself using x402 micropayments:
+This validates that **AI chat services can be metered at the message level** using x402:
 
-- ✅ **No subscriptions, no accounts** — pure pay-per-use
+- ✅ **No subscriptions, no accounts** — pure pay-per-message
 - ✅ **Machine-to-machine payments** for fully autonomous agents
-- ✅ **Cryptographic access control** — no payment proof = no AI response
+- ✅ **Cryptographic access control** — no confirmed payment = no AI response, ever
+- ✅ **Persistent context** — conversations are saved locally and the agent maintains thread awareness
 - ✅ **Instant Base Sepolia settlement** — fast, cheap, final
 
 ---
 
 ## 🎯 Features
 
+### 💬 Multi-Turn Agentic Chat
+
+> The core innovation of this MVP. This is not a single-query tool — it is a persistent, context-aware intelligence platform.
+
+| Capability | Detail |
+|-----------|--------|
+| 🧠 **Context Awareness** | The agent receives the last 6 messages as context, enabling deep, sequential analysis across a session — ask a follow-up and it understands what came before |
+| 💾 **Local Persistence** | Conversations are saved in the browser via `localStorage`. Close the tab, come back later, and your entire research thread is intact |
+| 💸 **Pay-per-Message** | Every chat bubble sent by the user triggers an independent `$0.01 USDC` x402 transaction confirmed on Base Sepolia — **not a batch, not an estimate, not a simulation** |
+| 🏦 **Continuous On-chain Proof** | The On-chain Transaction Log accumulates a tx hash per message, demonstrating the **scalability of x402 for real chat applications** with a live, auditable payment stream |
+
+### 🗂️ Modern Sidebar Interface
+
+> Conversation management at ChatGPT parity — but every session is on-chain.
+
+| Capability | Detail |
+|-----------|--------|
+| 📋 **Conversation List** | Collapsible sidebar listing all past sessions, auto-titled from the first message, sorted by recency |
+| ➕ **New Chat** | Start a fresh research session with one click — previous conversations remain accessible |
+| 🗑️ **Session Management** | Delete individual conversations; the sidebar shows message count and total USDC spent per session |
+| ✨ **Framer Motion Collapse** | Smooth slide-in/out animation; Toggle button appears when sidebar is closed |
+
+### ⚙️ Core Platform
+
 | Feature | Detail |
 |---------|--------|
-| 🔐 **Payment-Gated AI** | Content locked behind real x402 micropayment — no payment = no insight |
+| 🔐 **Payment-Gated AI** | Content locked behind real x402 micropayment — no confirmed payment = no response, period |
 | 🤖 **Gemini 3 Flash Preview** | Google's most advanced Flash model with retry & fallback chain |
-| 🎬 **4-Step Payment Overlay** | Animated steps: Estimate → Sign x402 → Verify → Unlock AI |
-| ✍️ **Typing Animation** | Word-by-word reveal for a premium AI terminal feel |
-| 💼 **Wallet Dropdown** | Real-time USDC/ETH balances, session stats, BaseScan link |
-| 📊 **Transaction Log** | Immutable sidebar history with tx hashes, costs, latency |
-| ⚠️ **Smart Error Handling** | Separate UI states for payment errors vs. AI errors |
+| 🎬 **4-Step Payment Overlay** | Animated gate: Estimate → Sign x402 → Verify → Unlock AI |
+| ✍️ **Typing Animation** | Word-by-word reveal on every assistant bubble |
+| 💼 **Agent Wallet Dropdown** | Real-time USDC/ETH balances across all sessions, BaseScan link |
+| 📊 **Per-Message TX Log** | tx hash, gas used, block number, and BaseScan link on each user bubble |
+| ⚠️ **Smart Error Handling** | Independent UI states for payment errors vs. AI errors |
 | 🔄 **Model Fallback Chain** | Gemini 3 → Gemini 2.0 Flash → Gemini 2.0 Flash Lite |
-| ⏱️ **Request Timeouts** | 30s server-side + 60s client-side safety nets |
-| 📱 **Responsive Dark UI** | Mobile-first, Tailwind CSS v4, Framer Motion animations |
+| ⏱️ **Request Timeouts** | 30s server-side + 120s client-side abort |
+| 📱 **Responsive Dark UI** | Mobile-first, Tailwind CSS v4, Framer Motion |
 
 ---
 
@@ -145,81 +174,102 @@ The agent wallet needs ETH (gas) and USDC on Base Sepolia. Use these faucets:
 
 ### ▶️ Step 3 — User Flow (End-to-End)
 
-Follow this exact flow to see the full x402 payment lifecycle:
+This is not a single query. It is a **research session**. Follow the full flow:
 
 **1️⃣ Open the app**
 
 ```
 http://localhost:3000
 ```
-You'll see the **dark dashboard** with suggested example queries and a "Transaction Log: 0 total" in the sidebar.
+You'll see the **three-panel chat interface**: a collapsible sidebar on the left, the main chat area in the center, and the On-chain Transaction Log on the right.
 
 ---
 
-**2️⃣ Type a market question**
+**2️⃣ Start a new conversation**
 
-Click any suggestion card or write your own query, for example:
+Click **"New Chat"** in the sidebar, or simply type in the input bar. A conversation is created automatically with an auto-generated title from your first message.
+
+Type an opening question, for example:
 
 ```
-What are the top 3 yield farming strategies on Base L2 right now?
+What are the top 3 yield farming strategies on Base right now?
 ```
-
-Watch the **real-time cost estimator** update in the top-right of the input box (e.g. `$0.02 USDC`).
 
 ---
 
-**3️⃣ Click "Pay & Generate"**
+**3️⃣ Send the message — watch the Payment Gate**
 
-The **Payment Gate overlay** activates and animates through 4 steps:
+Press **Enter** (or the send button). The **Payment Gate overlay** activates inline:
 
 ```
-✅ Estimating Compute Cost    ← PinionOS calculates skill calls
-✅ Signing x402 Payment       ← EIP-3009 authorization on Base Sepolia
-✅ Verifying Transaction      ← Facilitator confirms USDC settlement
-⏳ Unlocking AI Agent         ← Gemini 3 Flash generates insight
+✅ Estimating Compute Cost    ← PinionOS prepares the USDC transfer
+✅ Signing USDC Transfer      ← tx broadcast to Base Sepolia
+✅ On-chain Confirmation      ← 1-block confirmation received
+⏳ Unlocking AI Agent         ← Gemini 3 Flash generates the response
 ```
 
-> 🔒 **Key moment**: The AI call to Gemini is **only made after the x402 payment is validated** by PinionOS. The server-side API route enforces this — see `src/app/api/insight/route.ts`.
+> 🔒 **Key moment**: The AI call to Gemini is **only made after the x402 payment is confirmed on-chain**. The server-side route enforces this — see `src/app/api/insight/route.ts`.
 
 ---
 
-**4️⃣ View the AI Insight**
+**4️⃣ Read the response — then go deeper**
 
-Once payment is confirmed, the response **types out word by word** like a terminal. The header shows:
-- ✅ `Payment Verified` badge
-- 💰 Cost in USDC
-- ⚡ Latency in ms
-- 🤖 Model name (`gemini-3-flash-preview`)
-- `#` Token count
+The agent's reply **types out word-by-word** in the chat bubble. Each assistant bubble shows the model name and latency. Each user bubble shows the payment badge:
+
+```
+💬  [User]       What are the top 3 yield farming strategies on Base?
+                 ✅ $0.01 USDC  •  0x3fa2...b1c9 ↗  •  42,891 gas  •  #18,344,201
+
+🤖  [PINION-ALPHA]  gemini-3-flash-preview • 2,341ms
+                    ## TL;DR
+                    The highest risk-adjusted yields on Base are...
+```
+
+Now **send a follow-up** — the agent has the full prior context:
+
+```
+Drilling into the first strategy: what's the impermanent loss risk at current volatility?
+```
+
+This triggers a **second independent $0.01 USDC payment**, and Gemini receives the previous exchange as context.
 
 ---
 
-**5️⃣ Check the Transaction Log**
+**5️⃣ Watch the On-chain Transaction Log grow**
 
-In the **right sidebar**, a new entry appears:
+The **right-panel Transaction Log** updates per message sent. After a multi-turn session:
 
 ```
-✅  What are the top 3 yield farming...
-    $0.01 USDC  •  just now  •  [0xabc...] ↗
+✅  What are the top 3 yield farming...      $0.01 USDC  •  0x3fa2...b1c9 ↗  •  #18,344,201
+✅  Drilling into the first strategy...      $0.01 USDC  •  0x9cd8...44af ↗  •  #18,344,209
+✅  What's the TVL trend for this pool...    $0.01 USDC  •  0x12ab...f02e ↗  •  #18,344,217
 ```
 
-The `↗` icon links directly to **BaseScan** to verify the on-chain settlement.
+> 📈 **This is x402 at scale**: each row is an independent, immutable, on-chain proof that a specific AI response was purchased. A 10-message research session produces 10 on-chain transactions — demonstrating how the x402 protocol scales naturally to **real conversational AI products** without any off-chain billing infrastructure.
+
+---
+
+**6️⃣ Return to your research**
+
+Close the browser. Reopen it. Your conversations are still in the sidebar — titles, full message history, and all payment metadata — stored in `localStorage`. Pick up where you left off and every new message continues paying on-chain.
 
 ---
 
 ### 🔍 Step 4 — On-Chain Verification
 
-After a successful query, verify the payment happened on-chain:
+After a multi-turn session, every message has its own tx hash. Verify any of them:
 
-1. Copy the **tx hash** from the Transaction Log sidebar (click the `↗` link)
+1. Click the **`↗` link** on any user bubble (or in the Transaction Log panel)
 2. Open **[Base Sepolia Explorer](https://sepolia.basescan.org)**
 3. Search for the transaction hash
 4. Confirm:
    - ✅ USDC transfer of `$0.01` from the agent wallet
-   - ✅ Recipient is the PinionOS facilitator contract
+   - ✅ Recipient is the treasury wallet (`0x0ECA9442fFd1De45795623b63EfB4b2a89684Daa`)
    - ✅ Block is finalized
 
 > 🔐 **This proves the core claim**: Gemini only responded because the payment was cryptographically validated first. Without a confirmed x402 payment event, the API route returns `{ success: false, errorType: "payment" }` and **no AI call is ever made**.
+>
+> 🔗 **Proof of scale**: A multi-turn research session leaves behind a chain of USDC microtransactions — one per message — each with a unique block number and tx hash. This demonstrates that x402 is not just viable for single API calls, but **production-ready for continuous, real-time AI metering**.
 
 ---
 
@@ -260,12 +310,13 @@ This project directly satisfies the **Functionality** and **Completeness** crite
 
 | Criterion | Evidence |
 |-----------|---------|
-| ✅ **Functionality** | Full end-to-end flow working: query → x402 payment on Base Sepolia → Gemini 3 AI → typed response → on-chain log |
-| ✅ **Completeness** | Production build (`npm run build`) passes clean; all error states handled; mobile responsive |
-| ✅ **PinionOS Integration** | Real ethers.js USDC `transfer()` on Base Sepolia; `processPayment()` + `verifyTransaction()` at `src/lib/pinion.ts` |
-| ✅ **Creative Use Case** | AI gated behind autonomous micropayments — agent accumulates its own on-chain treasury |
-| ✅ **Code Quality** | Full TypeScript strict mode, modular architecture, documented with JSDoc |
-| ✅ **UX Polish** | Typing animation, payment overlay, wallet dropdown, smooth Framer Motion transitions |
+| ✅ **Functionality** | Complete multi-turn chat platform: message → $0.01 USDC x402 payment → context-aware Gemini 3 response → typed chat bubble → per-message on-chain log |
+| ✅ **Completeness** | Production build (`npm run build`) clean; all error states handled; localStorage persistence; mobile responsive |
+| ✅ **PinionOS Integration** | Real ethers.js USDC `transfer()` on Base Sepolia **per message**; `processPayment()` + `verifyTransaction()` at `src/lib/pinion.ts` |
+| ✅ **Creative Use Case** | The first x402-metered AI chat platform — conversational AI where **each message is an on-chain transaction**, agent builds its own treasury turn by turn |
+| ✅ **Protocol Scalability** | A 10-message session produces 10 independent tx hashes — live proof that x402 scales to real chat products with no off-chain billing layer |
+| ✅ **Code Quality** | Full TypeScript strict mode, modular architecture (`useConversations`, `ChatSidebar`, `ChatView`), documented with JSDoc |
+| ✅ **UX Polish** | ChatGPT-style sidebar, per-bubble payment badges with BaseScan links, Framer Motion collapse, typing animation |
 
 ---
 

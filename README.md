@@ -168,7 +168,7 @@ The agent wallet needs ETH (gas) and USDC on Base Sepolia. Use these faucets:
 | **ETH (gas)** | [Coinbase Base Faucet](https://portal.cdp.coinbase.com/products/faucet) | 0.1 ETH / day |
 | **USDC testnet** | [Circle USDC Faucet](https://faucet.circle.com/) | Select **Base Sepolia** + USDC |
 
-> 💡 **Tip**: Each query only costs **$0.01 USDC**. A single faucet drip covers hundreds of test queries.
+> 💡 **Tip**: Each query only costs **$0.01 USDC** per specific amount of tokens. A single faucet drip covers hundreds of test queries.
 
 ---
 
@@ -300,7 +300,7 @@ Every `$0.01 USDC` micropayment is routed to the Pinion Insight Agent **Treasury
 
 **Live on-chain proof (BaseScan):**
 
-> 🔗 _[Link to BaseScan — USDC incoming transfers to the Treasury Wallet]_ ← **INSERT LINK HERE AFTER DEMO**
+> 🔗 [_[Link to BaseScan — USDC incoming transfers to the Treasury Wallet]_](https://sepolia.basescan.org/tx/0x95439f8ea24fb347a118b5e9d93dbadf3ee6b0e72b786b8a9ef8b924f4e142cf)
 
 ---
 

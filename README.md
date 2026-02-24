@@ -5,7 +5,7 @@
 > A production-ready dashboard demonstrating the future of monetized AI agents. Every insight is paid for on-chain — in real time — via PinionOS x402 on Base Sepolia Testnet.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/PinionOS-Hackathon%202025-blueviolet?style=for-the-badge&logo=ethereum&logoColor=white" alt="Hackathon" />
+  <img src="https://img.shields.io/badge/PinionOS-Hackathon%202026-blueviolet?style=for-the-badge&logo=ethereum&logoColor=white" alt="Hackathon" />
   <img src="https://img.shields.io/badge/Next.js-16.1.6-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/Gemini-3%20Flash%20Preview-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini 3" />
   <img src="https://img.shields.io/badge/PinionOS-x402%20Protocol-06b6d4?style=for-the-badge&logo=ethereum&logoColor=white" alt="PinionOS" />

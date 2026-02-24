@@ -14,15 +14,25 @@ interface ChatInputProps {
   onSubmit: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
+  /** Controlled value — lets parent pre-fill the input (e.g. suggestion cards) */
+  value?: string;
+  onValueChange?: (value: string) => void;
 }
 
 export default function ChatInput({
   onSubmit,
   isLoading,
   disabled,
+  value: externalValue,
+  onValueChange,
 }: ChatInputProps) {
-  const [message, setMessage] = useState("");
+  const [internalMessage, setInternalMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Use controlled value when provided, otherwise internal state
+  const isControlled = externalValue !== undefined && onValueChange !== undefined;
+  const message = isControlled ? externalValue : internalMessage;
+  const setMessage = isControlled ? onValueChange : setInternalMessage;
 
   // Auto-resize textarea
   useEffect(() => {
@@ -37,6 +47,13 @@ export default function ChatInput({
   useEffect(() => {
     textareaRef.current?.focus();
   }, []);
+
+  // When a suggestion fills the input, focus the textarea
+  useEffect(() => {
+    if (isControlled && externalValue) {
+      textareaRef.current?.focus();
+    }
+  }, [isControlled, externalValue]);
 
   const handleSubmit = () => {
     if (message.trim() && !isLoading && !disabled) {

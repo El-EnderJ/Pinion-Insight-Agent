@@ -31,12 +31,14 @@ import type { ChatMessage } from "@/types";
 interface ChatViewProps {
   messages: ChatMessage[];
   isLoading: boolean;
+  /** Called when the user clicks a suggestion card in the empty state */
+  onSuggestionClick?: (text: string) => void;
 }
 
 /** Speed of typing reveal in ms per chunk */
 const TYPING_SPEED = 25;
 
-export default function ChatView({ messages, isLoading }: ChatViewProps) {
+export default function ChatView({ messages, isLoading, onSuggestionClick }: ChatViewProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new messages or loading state
@@ -45,7 +47,7 @@ export default function ChatView({ messages, isLoading }: ChatViewProps) {
   }, [messages.length, isLoading]);
 
   if (messages.length === 0 && !isLoading) {
-    return <EmptyState />;
+    return <EmptyState onSuggestionClick={onSuggestionClick} />;
   }
 
   return (
@@ -282,7 +284,25 @@ function AssistantBubble({
 
 /* ─── Empty State ─────────────────────────────────────────────────── */
 
-function EmptyState() {
+const SUGGESTION_PROMPTS = [
+  "Analyze the current market sentiment for Ethereum and predict short-term price movement based on on-chain metrics.",
+  "What are the top 3 yield farming strategies on Base right now with the best risk-adjusted returns?",
+  "Deep dive into the tokenomics of USDC on Base. How does it compare to native stablecoins in the ecosystem?",
+  "Explain the x402 payment protocol and how autonomous agents use it for machine-to-machine micropayments.",
+];
+
+const SUGGESTION_LABELS = [
+  "Market Sentiment",
+  "DeFi Yield Strategies",
+  "USDC Tokenomics",
+  "x402 Protocol",
+];
+
+function EmptyState({
+  onSuggestionClick,
+}: {
+  onSuggestionClick?: (text: string) => void;
+}) {
   return (
     <div className="flex-1 flex items-center justify-center px-4">
       <div className="text-center max-w-md">
@@ -298,18 +318,17 @@ function EmptyState() {
           payment on Base Sepolia via PinionOS.
         </p>
         <div className="grid grid-cols-2 gap-2 text-left">
-          {[
-            "Ethereum market sentiment analysis",
-            "Top DeFi yield strategies on Base",
-            "USDC tokenomics deep dive",
-            "x402 payment protocol explained",
-          ].map((prompt) => (
-            <div
+          {SUGGESTION_PROMPTS.map((prompt, idx) => (
+            <button
               key={prompt}
-              className="p-2.5 rounded-lg bg-card/50 border border-card-border/50 text-xs text-muted"
+              onClick={() => onSuggestionClick?.(prompt)}
+              className="p-2.5 rounded-lg bg-card/50 border border-card-border/50 text-left hover:border-accent/30 hover:bg-card transition-all group"
             >
-              {prompt}
-            </div>
+              <div className="text-xs font-semibold text-foreground group-hover:text-accent transition-colors mb-0.5">
+                {SUGGESTION_LABELS[idx]}
+              </div>
+              <div className="text-xs text-muted line-clamp-2">{prompt}</div>
+            </button>
           ))}
         </div>
       </div>

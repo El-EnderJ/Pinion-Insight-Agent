@@ -42,8 +42,10 @@ export default function Home() {
 
   const { wallet, isConnected, refreshBalance } = usePinion();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [inputValue, setInputValue] = useState("");
 
   const handleSendMessage = async (content: string) => {
+    setInputValue("");  // clear after send
     await sendMessage(content);
     refreshBalance();
   };
@@ -125,6 +127,7 @@ export default function Home() {
           <ChatView
             messages={activeConversation?.messages ?? []}
             isLoading={isLoading}
+            onSuggestionClick={setInputValue}
           />
 
           {/* Payment Gate (overlay during processing) */}
@@ -144,6 +147,8 @@ export default function Home() {
           <ChatInput
             onSubmit={handleSendMessage}
             isLoading={isLoading}
+            value={inputValue}
+            onValueChange={setInputValue}
           />
         </div>
 

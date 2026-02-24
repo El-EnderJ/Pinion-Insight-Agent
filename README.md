@@ -286,7 +286,7 @@ docker run -p 3000:3000 \
 
 ## 🙌 Credits
 
-**Developed by [Ender Designs](https://github.com/your-username)**
+**Developed by [Ender Designs](https://github.com/El-EnderJ)**
 
 Built on top of:
 - [PinionOS](https://github.com/chu2bard/pinion-os) — x402 Micropayment Protocol on Base

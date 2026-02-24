@@ -237,16 +237,33 @@ The UI **always shows whether payment succeeded** independently of whether the A
 
 ---
 
-## 🏆 Hackathon Criteria
+## � Project Treasury
+
+Every `$0.01 USDC` micropayment is routed to the Pinion Insight Agent **Treasury Wallet** on Base Sepolia — the agent literally earns its own income on-chain.
+
+| Field | Value |
+|-------|-------|
+| **Address** | `0x0ECA9442fFd1De45795623b63EfB4b2a89684Daa` |
+| **Network** | Base Sepolia Testnet (chainId 84532) |
+| **Asset** | USDC (`0x036CbD53842c5426634e7929541eC2318f3dCF7e`) |
+| **Amount per query** | $0.01 USDC |
+
+**Live on-chain proof (BaseScan):**
+
+> 🔗 _[Link to BaseScan — USDC incoming transfers to the Treasury Wallet]_ ← **INSERT LINK HERE AFTER DEMO**
+
+---
+
+## �🏆 Hackathon Criteria
 
 This project directly satisfies the **Functionality** and **Completeness** criteria:
 
 | Criterion | Evidence |
 |-----------|---------|
-| ✅ **Functionality** | Full end-to-end flow working: query → x402 payment → Gemini 3 AI → typed response → on-chain log |
+| ✅ **Functionality** | Full end-to-end flow working: query → x402 payment on Base Sepolia → Gemini 3 AI → typed response → on-chain log |
 | ✅ **Completeness** | Production build (`npm run build`) passes clean; all error states handled; mobile responsive |
-| ✅ **PinionOS Integration** | Real `PinionClient` SDK calls; `executePayment()` and `getWalletBalance()` at `src/lib/pinion.ts` |
-| ✅ **Creative Use Case** | AI gated behind autonomous micropayments — a novel business model for the agent economy |
+| ✅ **PinionOS Integration** | Real ethers.js USDC `transfer()` on Base Sepolia; `processPayment()` + `verifyTransaction()` at `src/lib/pinion.ts` |
+| ✅ **Creative Use Case** | AI gated behind autonomous micropayments — agent accumulates its own on-chain treasury |
 | ✅ **Code Quality** | Full TypeScript strict mode, modular architecture, documented with JSDoc |
 | ✅ **UX Polish** | Typing animation, payment overlay, wallet dropdown, smooth Framer Motion transitions |
 

@@ -139,7 +139,7 @@ The agent wallet needs ETH (gas) and USDC on Base Sepolia. Use these faucets:
 | **ETH (gas)** | [Coinbase Base Faucet](https://portal.cdp.coinbase.com/products/faucet) | 0.1 ETH / day |
 | **USDC testnet** | [Circle USDC Faucet](https://faucet.circle.com/) | Select **Base Sepolia** + USDC |
 
-> 💡 **Tip**: Each query only costs **$0.01 USDC**. A single faucet drip covers hundreds of test queries.
+> 💡 **Tip**: Each query only costs **$0.01 USDC** per specific amount of tokens. A single faucet drip covers hundreds of test queries.
 
 ---
 
